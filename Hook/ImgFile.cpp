@@ -34,7 +34,7 @@ namespace {
 
 	// TMS113  int __cdecl PcCreateObject::IWzNameSpace(int a1, _DWORD *a2, int a3)
 	// KMS1029 void __cdecl PcCreateObject::IWzNameSpace(const wchar_t* sUOL, _com_ptr_t* pObj, IUnknown* pUnkOuter)
-	void(__cdecl* _PcCreateObject__IWzNameSpace)(const wchar_t* sUOL, void* pObj, void* pUnkOuter);
+	void(__cdecl* _PcCreateObject__IWzNameSpace)(const wchar_t* sUOL, void* pObj, void* pUnkOuter) = nullptr;
 
 	// TMS113  void (__cdecl *)(int *, int)
 	// KMS1029 HRESULT __cdecl PcSetRootNameSpace(IUnknown *pNameSpace)

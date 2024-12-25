@@ -9,6 +9,8 @@ namespace Config {
 	const unsigned short LoginServerPort = 8484;
 	const bool IsSendConnectKey = false;
 	const std::string ConnectKey = "secret";
+	const bool IsRecvXOR = false;
+	const unsigned char RecvXOR = 0xFF;
 	// Screen
 	const std::string WindowTitle = "goms";
 	const bool IsMultipleClient = true;

@@ -84,10 +84,11 @@ namespace {
 	// 2.RemoveLocaleCheck(option): For other locale
 	// 3.Redirect: Modify connect ip and port
 	// 4.SendConnectKey(option): Avoid using cmd start client
-	// 5.RemoveAntiCheat: NGS/HS/X3
-	// 6.ImgFileMount: Convert wz file to img format
-	// 7.FixWindowMode(option): Avoid old client can't run with recent displays
-	// 8.RemoveCRC: Avoid client crash after 30s or enter field
+	// 5.RecvXOR(option): XOR all packet from server
+	// 6.RemoveAntiCheat: NGS/HS/X3
+	// 7.MountImgFile: Convert wz file to img format
+	// 8.FixWindowMode(option): Avoid old client can't run with recent displays
+	// 9.RemoveCRC: Avoid client crash after 30s or enter field
 	static auto _GetStartupInfoA = decltype(&GetStartupInfoA)(GetProcAddress(GetModuleHandleW(L"KERNEL32"), "GetStartupInfoA"));
 	VOID WINAPI GetStartupInfoA_Hook(LPSTARTUPINFOA lpStartupInfo) {
 		if (lpStartupInfo && !bGetStartupInfoALoaded && IsEXECaller(_ReturnAddress())) {
@@ -100,14 +101,19 @@ namespace {
 				DEBUG(L"Unable to remove locale check");
 			}
 			// Click Play button
-			if (Config::IsSendConnectKey) {
-				Socket::SetConnectKey(Config::ConnectKey);
-			}
 			if (!Socket::InitWSAData()) {
 				DEBUG(L"Unable to init WSAData");
 			}
+			if (Config::IsSendConnectKey) {
+				Socket::SetConnectKey(Config::ConnectKey);
+			}
 			if (!Socket::Redirect(Config::LoginServerAddr, Config::LoginServerPort)) {
 				DEBUG(L"Unable to redirect the connection");
+			}
+			if (Config::IsRecvXOR) {
+				if (!Socket::RecvXOR(Config::RecvXOR)) {
+					DEBUG(L"Unable to hook recv");
+				}
 			}
 			// Load AntiCheat 
 			if (!Auth::RemoveAntiCheat(gMapleR)) {

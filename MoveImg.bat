@@ -12,14 +12,14 @@ pushd "%basefolder%"
 move *.img ..
 popd
 
+echo Delete Base.wz folder...
+rmdir /s /q "%basefolder%"
+
 echo Rename folder...
 for /d %%f in (*.wz) do (
     set foldername=%%~nf
     ren "%%f" "!foldername!"
 )
-
-echo Delete Base folder...
-rmdir /s /q "%basefolder%"
 
 echo Done!
 

@@ -16,6 +16,7 @@ namespace {
 	static WSADATA wsaData{};
 	static struct sockaddr* gSockAddr = nullptr;
 	static std::string connectKey = "";
+	static unsigned char recvXOR = 0x00;
 
 	std::string IP2Str(const struct sockaddr* name) {
 		std::string ipStr = "";
@@ -184,6 +185,30 @@ namespace {
 		SetLastError(WSAEWOULDBLOCK);
 		return res;
 	}
+
+	// 1.Server XOR all OutPacket(include OnConnect packet)
+	// 2.Client need to recover original packet through XOR during recv
+	static auto _recv = decltype(&recv)(GetProcAddress(GetModuleHandleW(L"Ws2_32.dll"), "recv"));
+	int WINAPI recv_Hook(SOCKET s, char* buf, int len, int flags) {
+		int res = _recv(s, buf, len, flags);
+		if (recvXOR == 0x00) {
+			DEBUG(L"recvXOR is empty");
+			return res;
+		}
+		if (res == SOCKET_ERROR) {
+			DEBUG(L"recv failed with error");
+			SCANRES(WSAGetLastError());
+			return res;
+		}
+		if (res == 0) {
+			DEBUG(L"Connection was closed by peer");
+			return res;
+		}
+		for (int i = 0; i < res; i++) {
+			buf[i] ^= recvXOR;
+		}
+		return res;
+	}
 }
 
 namespace Socket {
@@ -217,5 +242,14 @@ namespace Socket {
 	bool Redirect(const std::string& addr, const unsigned short port) {
 		InitSockAddr(&gSockAddr, addr, port);
 		return SHOOK(true, &_connect, connect_Hook);
+	}
+
+	bool RecvXOR(const unsigned char XOR) {
+		if (XOR == 0x00) {
+			DEBUG(L"XOR is empty");
+			return false;
+		}
+		recvXOR = XOR;
+		return SHOOK(true, &_recv, recv_Hook);
 	}
 }

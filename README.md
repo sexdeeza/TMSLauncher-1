@@ -7,6 +7,7 @@ TW MapleStory old version launcher
 - Remove locale check
 - Redirect server ip and port
 - Send connect key to server(option)
+- XOR all packet from server(option)
 - Remove Anti-Cheat(NGS/HS/X3)
 - Mount img file(option)
 - Fix window mode error(BeforeBB)
