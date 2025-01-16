@@ -15,8 +15,8 @@ namespace {
 		}
 		ULONG_PTR uStartKeyCrypt = uAddress + 0x05 + *(ULONG_PTR*)(uAddress + 0x01);
 		ULONG_PTR uStopKeyCrypt = uAddress + 0x0C + *(ULONG_PTR*)(uAddress + 0x08);
-		return r.WriteBytes(uStartKeyCrypt, AOB_Patch_Ret) &&
-			r.WriteBytes(uStopKeyCrypt, AOB_Patch_Ret);
+		return r.WriteCode(uStartKeyCrypt, AOB_Patch_Ret) &&
+			r.WriteCode(uStopKeyCrypt, AOB_Patch_Ret);
 	}
 
 	bool HSThing(Rosemary& r) {
@@ -81,19 +81,19 @@ namespace Auth {
 		else if (index == 1) {
 			// TMS145 can't find TSingleton<CSecurityClient>::IsInstantiated in CWvsApp::ZtlExceptionHandler
 			ULONG_PTR CSecurityClientIsInstantiated = uAddress + 0x08;
-			return r.WriteBytes(CSecurityClientIsInstantiated, AOB_Patch_Ret);
+			return r.WriteCode(CSecurityClientIsInstantiated, AOB_Patch_Ret);
 		}
 		else if (index < 5) {
 			// TMS122-TMS192
 			// Call TSingleton<CSecurityClient>::IsInstantiated in CWvsApp::ZtlExceptionHandler(68 00 00 00 80 6A 02)
 			ULONG_PTR CSecurityClientIsInstantiated = GetFuncAddress(uAddress);
-			return r.WriteBytes(CSecurityClientIsInstantiated, AOB_Patch_Ret);
+			return r.WriteCode(CSecurityClientIsInstantiated, AOB_Patch_Ret);
 		}
 		else if (index == 5) {
 			// TMS194 can't find TSingleton<CSecurityClient>::IsInstantiated in CWvsApp::ZtlExceptionHandler
 			// Call TSingleton<CSecurityClient>::GetInstance in CSecurityClient::EncodeMemoryCheckResult
 			ULONG_PTR CSecurityClientIsInstantiated = GetFuncAddress(uAddress) + 0x06;
-			return r.WriteBytes(CSecurityClientIsInstantiated, AOB_Patch_Ret);
+			return r.WriteCode(CSecurityClientIsInstantiated, AOB_Patch_Ret);
 		}
 		else {
 			DEBUG(L"Unknown index in RemoveAntiCheat");

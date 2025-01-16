@@ -143,16 +143,18 @@ namespace {
 
 	static auto _CreateWindowExA = decltype(&CreateWindowEx)(GetProcAddress(GetModuleHandleW(L"USER32"), "CreateWindowExA"));
 	HWND WINAPI CreateWindowExA_Hook(DWORD dwExStyle, LPCTSTR lpClassName, LPCTSTR lpWindowName, DWORD dwStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam) {
-		auto lpLocalWndName = lpWindowName;
-		if (!strcmp(lpClassName, "MapleStoryClass") && !bCreateWindowExALoaded) {
-			bCreateWindowExALoaded = true;
-			lpLocalWndName = Config::WindowTitle.c_str(); //Customize game windowtitle 			
+		// AoB 68 00 00 04 80
+		if (lpClassName && strstr(lpClassName, "StartUpDlgClass")) {
+			// Found in ShowADBalloon 
+			return NULL;
+		}
+		if (lpClassName && strstr(lpClassName, "MapleStoryClass")) {
+			// Found in ShowStartUpWnd
+			lpWindowName = Config::WindowTitle.c_str(); //Customize game windowtitle 	
 			Screen::FixMinimizeButton(dwStyle); // Show minimize button for TMS113 - TMS118
 		}
-		if (!strcmp(lpClassName, "StartUpDlgClass")) {
-			return NULL; // Remove ads window
-		}
-		return _CreateWindowExA(dwExStyle, lpClassName, lpLocalWndName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+
+		return _CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 	}
 
 	// CreateMutexA is the first Windows library call after the executable unpacks itself. 
@@ -166,7 +168,7 @@ namespace {
 		}
 		if (Config::IsMultipleClient) {
 			// Put this condition at the bottom
-			if (lpName && !strcmp(lpName, "WvsClientMtx")) {
+			if (lpName && strstr(lpName, "WvsClientMtx")) {
 				// MultiClient: faking HANDLE is 0xBADF00D(BadFood)
 				return (HANDLE)0xBADF00D;
 			}

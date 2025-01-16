@@ -109,7 +109,6 @@ ULONG_PTR Rosemary::Scan(std::wstring wAobList[], size_t size, size_t& index, bo
 	return 0;
 }
 
-
 ULONG_PTR Rosemary::Scan(std::wstring wAob, bool(*Scanner)(ULONG_PTR)) {
 	if (!init) {
 		return 0;
@@ -134,7 +133,82 @@ ULONG_PTR Rosemary::Scan(std::wstring wAob, bool(*Scanner)(ULONG_PTR)) {
 	return 0;
 }
 
+bool Rosemary::WriteCode(ULONG_PTR uAddress, const std::wstring wCode) {
+	if (!uAddress) {
+		return false;
+	}
+	if (wCode.length() < 2) {
+		return false;
+	}
+	std::wstring Code;
+	// Format wCode to Code
+	for (size_t i = 0; i < wCode.length(); i++) {
+		if (wCode[i] == L' ') {
+			// Skip spaces
+			continue;
+		}
+		if (L'0' <= wCode[i] && wCode[i] <= L'9') {
+			Code.push_back(wCode[i]);
+			continue;
+		}
+		if (L'A' <= wCode[i] && wCode[i] <= L'F') {
+			Code.push_back(wCode[i]);
+			continue;
+		}
+		if (L'a' <= wCode[i] && wCode[i] <= L'f') {
+			// toupper
+			Code.push_back((unsigned short)wCode[i] - 0x20);
+			continue;
+		}
+		return false;
+	}
+
+	if (Code.length() % 2) {
+		return false;
+	}
+
+	// Convert hex string to byte vector
+	std::vector<unsigned char> code;
+	for (size_t i = 0; i < Code.length(); i += 2) {
+		unsigned char t = 0x00;
+		if (L'0' <= Code[i] && Code[i] <= L'9') {
+			t |= ((unsigned char)Code[i] - 0x30) << 4;
+		}
+		else if (L'A' <= Code[i] && Code[i] <= L'F') {
+			t |= ((unsigned char)Code[i] - 0x37) << 4;
+		}
+		if (L'0' <= Code[i + 1] && Code[i + 1] <= L'9') {
+			t |= ((unsigned char)Code[i + 1] - 0x30);
+		}
+		else if (L'A' <= Code[i + 1] && Code[i + 1] <= L'F') {
+			t |= ((unsigned char)Code[i + 1] - 0x37);
+		}
+
+		code.push_back(t);
+	}
+
+	if (!code.size()) {
+		return false;
+	}
+
+	DWORD oldProtect = 0;
+	if (!VirtualProtect((void*)uAddress, code.size(), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+		return false;
+	}
+
+	for (size_t i = 0; i < code.size(); i++) {
+		((BYTE*)uAddress)[i] = code[i];
+	}
+
+	VirtualProtect((void*)uAddress, code.size(), oldProtect, &oldProtect);
+
+	return true;
+}
+
 bool Rosemary::WriteByte(ULONG_PTR uAddress, const unsigned char ucValue) {
+	if (!uAddress) {
+		return false;
+	}
 	DWORD oldProtect = 0;
 	size_t nSize = sizeof(ucValue);
 	if (!VirtualProtect((void*)uAddress, nSize, PAGE_EXECUTE_READWRITE, &oldProtect)) {
@@ -148,37 +222,26 @@ bool Rosemary::WriteByte(ULONG_PTR uAddress, const unsigned char ucValue) {
 	return true;
 }
 
-bool Rosemary::WriteBytes(ULONG_PTR uAddress, const unsigned char* ucValue) {
-	if (ucValue == nullptr) {
-		return false;
-	}
-	DWORD oldProtect = 0;
-	size_t nSize = sizeof(ucValue);
-	if (!VirtualProtect((void*)uAddress, nSize, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		return false;
-	}
-	memcpy((void*)uAddress, ucValue, nSize);
-
-	VirtualProtect((void*)uAddress, nSize, oldProtect, &oldProtect);
-
-	return true;
-}
-
 bool Rosemary::FillBytes(ULONG_PTR uAddress, const unsigned char ucValue, const int nCount) {
+	if (!uAddress) {
+		return false;
+	}
 	DWORD oldProtect = 0;
-	size_t nSize = sizeof(ucValue);
-	if (!VirtualProtect((void*)uAddress, nSize, PAGE_EXECUTE_READWRITE, &oldProtect)) {
+	if (!VirtualProtect((void*)uAddress, nCount, PAGE_EXECUTE_READWRITE, &oldProtect)) {
 		return false;
 	}
 
 	memset((void*)uAddress, ucValue, nCount);
 
-	VirtualProtect((void*)uAddress, nSize, oldProtect, &oldProtect);
+	VirtualProtect((void*)uAddress, nCount, oldProtect, &oldProtect);
 
 	return true;
 }
 
 bool Rosemary::WriteShort(ULONG_PTR uAddress, const unsigned short usValue) {
+	if (!uAddress) {
+		return false;
+	}
 	DWORD oldProtect = 0;
 	size_t nSize = sizeof(usValue);
 	if (!VirtualProtect((void*)uAddress, nSize, PAGE_EXECUTE_READWRITE, &oldProtect)) {
@@ -193,6 +256,9 @@ bool Rosemary::WriteShort(ULONG_PTR uAddress, const unsigned short usValue) {
 }
 
 bool Rosemary::WriteInt(ULONG_PTR uAddress, const unsigned int uiValue) {
+	if (!uAddress) {
+		return false;
+	}
 	DWORD oldProtect = 0;
 	size_t nSize = sizeof(uiValue);
 	if (!VirtualProtect((void*)uAddress, nSize, PAGE_EXECUTE_READWRITE, &oldProtect)) {
@@ -207,6 +273,9 @@ bool Rosemary::WriteInt(ULONG_PTR uAddress, const unsigned int uiValue) {
 }
 
 bool Rosemary::WriteLong(ULONG_PTR uAddress, const unsigned long ulValue) {
+	if (!uAddress) {
+		return false;
+	}
 	DWORD oldProtect = 0;
 	size_t nSize = sizeof(ulValue);
 	if (!VirtualProtect((void*)uAddress, nSize, PAGE_EXECUTE_READWRITE, &oldProtect)) {
@@ -221,6 +290,9 @@ bool Rosemary::WriteLong(ULONG_PTR uAddress, const unsigned long ulValue) {
 }
 
 bool Rosemary::WriteString(ULONG_PTR uAddress, const char* cValue) {
+	if (!uAddress) {
+		return false;
+	}
 	if (cValue == nullptr) {
 		return false;
 	}
@@ -237,6 +309,9 @@ bool Rosemary::WriteString(ULONG_PTR uAddress, const char* cValue) {
 }
 
 bool Rosemary::WriteFloat(ULONG_PTR uAddress, const float fValue) {
+	if (!uAddress) {
+		return false;
+	}
 	DWORD oldProtect = 0;
 	size_t nSize = sizeof(fValue);
 	if (!VirtualProtect((void*)uAddress, nSize, PAGE_EXECUTE_READWRITE, &oldProtect)) {
@@ -251,6 +326,9 @@ bool Rosemary::WriteFloat(ULONG_PTR uAddress, const float fValue) {
 }
 
 bool Rosemary::WriteDouble(ULONG_PTR uAddress, const double dValue) {
+	if (!uAddress) {
+		return false;
+	}
 	DWORD oldProtect = 0;
 	size_t nSize = sizeof(dValue);
 	if (!VirtualProtect((void*)uAddress, nSize, PAGE_EXECUTE_READWRITE, &oldProtect)) {
