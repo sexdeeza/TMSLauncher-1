@@ -1,14 +1,9 @@
-#include "Screen.h"
-#include "AobList.h"
-#include "Tool.h"
+#include "Wnd.h"
 
-namespace Screen {
-	bool FixDomain(Rosemary& r) {
-		// TMS old default DNS (Unable show ad window if not set)
-		return r.StringPatch("tw.login.maplestory.gamania.com", "127.0.0.1");
-		// Not need this because HS has been removed
-		//r.StringPatch("tw.hackshield.gamania.com", "202.80.106.36");
-	}
+#include "Resources/AOBList.h"
+#include "Share/Tool.h"
+
+namespace Wnd {
 
 	bool FixWindowMode(Rosemary& r) {
 		// Window mode is needed to run old client with recent displays

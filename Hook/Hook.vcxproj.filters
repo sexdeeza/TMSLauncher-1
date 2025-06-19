@@ -19,11 +19,8 @@
     <Filter Include="Source Files\Share">
       <UniqueIdentifier>{fd8f90a4-d30e-4f15-bdc9-ff4946b826ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Maple">
-      <UniqueIdentifier>{bc4b1459-d8d9-43ba-9913-a7fa59a8c8f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Maple">
-      <UniqueIdentifier>{99684e9e-83de-4a57-be09-e44d03bb52db}</UniqueIdentifier>
+    <Filter Include="Header Files\com">
+      <UniqueIdentifier>{7dc8f18b-3caa-440d-9609-092a008eb7c5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -33,76 +30,94 @@
     <ClInclude Include="Share\Rosemary.h">
       <Filter>Header Files\Share</Filter>
     </ClInclude>
-    <ClInclude Include="Share\AobScan.h">
+    <ClInclude Include="Share\AOBScan.h">
       <Filter>Header Files\Share</Filter>
     </ClInclude>
-    <ClInclude Include="Auth.h">
+    <ClInclude Include="AntiCheat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AobList.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CRC.h">
+    <ClInclude Include="Wnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Tool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Screen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Config.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImgFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Socket.h">
+    <ClInclude Include="Network.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Share\Funcs.h">
       <Filter>Header Files\Share</Filter>
     </ClInclude>
-    <ClInclude Include="Maple\CWvsApp.h">
-      <Filter>Header Files\Maple</Filter>
+    <ClInclude Include="ResMan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\AOBList.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\Config.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Share\Tool.h">
+      <Filter>Header Files\Share</Filter>
+    </ClInclude>
+    <ClInclude Include="com\canvas.h">
+      <Filter>Header Files\com</Filter>
+    </ClInclude>
+    <ClInclude Include="com\com.h">
+      <Filter>Header Files\com</Filter>
+    </ClInclude>
+    <ClInclude Include="com\gr2d.h">
+      <Filter>Header Files\com</Filter>
+    </ClInclude>
+    <ClInclude Include="com\shape2d.h">
+      <Filter>Header Files\com</Filter>
+    </ClInclude>
+    <ClInclude Include="com\uol.h">
+      <Filter>Header Files\com</Filter>
+    </ClInclude>
+    <ClInclude Include="com\serialize.h">
+      <Filter>Header Files\com</Filter>
+    </ClInclude>
+    <ClInclude Include="DamageSkin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="com\property.h">
+      <Filter>Header Files\com</Filter>
+    </ClInclude>
+    <ClInclude Include="com\archive.h">
+      <Filter>Header Files\com</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Share\AobScan.cpp">
+    <ClCompile Include="Share\AOBScan.cpp">
       <Filter>Source Files\Share</Filter>
     </ClCompile>
     <ClCompile Include="Share\Rosemary.cpp">
       <Filter>Source Files\Share</Filter>
     </ClCompile>
-    <ClCompile Include="Auth.cpp">
+    <ClCompile Include="AntiCheat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CRC.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Screen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImgFile.cpp">
+    <ClCompile Include="Wnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Hook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Socket.cpp">
+    <ClCompile Include="Network.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Share\Funcs.cpp">
       <Filter>Source Files\Share</Filter>
     </ClCompile>
-    <ClCompile Include="Maple\CWvsApp.cpp">
-      <Filter>Source Files\Maple</Filter>
+    <ClCompile Include="ResMan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Share\Tool.cpp">
+      <Filter>Source Files\Share</Filter>
+    </ClCompile>
+    <ClCompile Include="DamageSkin.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

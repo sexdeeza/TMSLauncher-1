@@ -1,10 +1,10 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include "Socket.h"
-#include "AobList.h"
-#include "Tool.h"
+#include "Network.h"
 
+#include "Resources/AOBList.h"
 #include "Share/Funcs.h"
+#include "Share/Tool.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -14,9 +14,12 @@ namespace {
 	const int timeoutSec = 5;
 
 	static WSADATA wsaData{};
-	static struct sockaddr* gSockAddr = nullptr;
+	static struct sockaddr* gChannelSockAddr = nullptr;
+	static struct sockaddr* gLoginSockAddr = nullptr;
 	static std::string connectKey = "";
 	static unsigned char recvXOR = 0x00;
+	static unsigned char sendXOR = 0x00;
+	static BYTE gMapleVersion;
 
 	std::string IP2Str(const struct sockaddr* name) {
 		std::string ipStr = "";
@@ -154,14 +157,34 @@ namespace {
 	// 5.Send connect key before CClientSocket::OnConnect(this,bSuccess)
 	static auto _connect = decltype(&connect)(GetProcAddress(GetModuleHandleW(L"Ws2_32.dll"), "connect"));
 	int WINAPI connect_Hook(SOCKET s, const struct sockaddr* name, int namelen) {
-		sockaddr_in* addr_in = (sockaddr_in*)name;
 		int res = SOCKET_ERROR;
-		if (addr_in->sin_port == htons(defaultPort)) {
-			DEBUG(L"Connect to " + Str2WStr(IP2Str(gSockAddr)));
-			res = _connect(s, gSockAddr, sizeof(*gSockAddr));
+		sockaddr_in* addr_in = (sockaddr_in*)name;
+		std::string serverReturnedIP = IP2Str(name);
+		USHORT serverReturnedPort = ntohs(addr_in->sin_port);
+		if (serverReturnedPort == defaultPort) {
+			DEBUG(L"Connect to login server");
+			res = _connect(s, gLoginSockAddr, sizeof(*gLoginSockAddr));
 		}
 		else {
-			res = _connect(s, name, namelen);
+			DEBUG(L"Connect to channel server with port:" + std::to_wstring(serverReturnedPort));
+			if (serverReturnedIP == defaultIP) {
+				// Server returned localhost ip and channel port
+				if (gChannelSockAddr->sa_family == AF_INET6) {
+					sockaddr_in6* addr_ipv6 = (sockaddr_in6*)gChannelSockAddr;
+					addr_ipv6->sin6_port = addr_in->sin_port;
+				}
+				else {
+					sockaddr_in* addr_ipv4 = (sockaddr_in*)gChannelSockAddr;
+					addr_ipv4->sin_port = addr_in->sin_port;
+				}
+				// Using launcher-side addr to connect channel server
+				res = _connect(s, gChannelSockAddr, sizeof(*gChannelSockAddr));
+			}
+			else {
+				// Server returned public ip and channel port
+				// Using server-provided addr to connect channel server
+				res = _connect(s, name, namelen);
+			}
 		}
 		if (connectKey.empty()) {
 			return res;
@@ -186,32 +209,51 @@ namespace {
 		return res;
 	}
 
-	// 1.Server XOR all OutPacket(include OnConnect packet)
+	// 1.Server XOR all OutPacket length and payload (also include OnConnect packet)
 	// 2.Client need to recover original packet through XOR during recv
+	// 3.Get maple version from connect packet
 	static auto _recv = decltype(&recv)(GetProcAddress(GetModuleHandleW(L"Ws2_32.dll"), "recv"));
 	int WINAPI recv_Hook(SOCKET s, char* buf, int len, int flags) {
 		int res = _recv(s, buf, len, flags);
-		if (recvXOR == 0x00) {
-			DEBUG(L"recvXOR is empty");
-			return res;
-		}
 		if (res == SOCKET_ERROR) {
-			DEBUG(L"recv failed with error");
-			SCANRES(WSAGetLastError());
 			return res;
 		}
 		if (res == 0) {
 			DEBUG(L"Connection was closed by peer");
 			return res;
 		}
-		for (int i = 0; i < res; i++) {
-			buf[i] ^= recvXOR;
+		if (recvXOR != 0x00) {
+			for (int i = 0; i < res; i++) {
+				buf[i] ^= recvXOR;
+			}
+		}
+		if (res > 2 && gMapleVersion == 0) {
+			gMapleVersion = buf[0];
+		}
+		return res;
+	}
+
+	// Server need to recover original packet through XOR during recv
+	static auto _send = decltype(&send)(GetProcAddress(GetModuleHandleW(L"Ws2_32.dll"), "send"));
+	int WINAPI send_Hook(SOCKET s, char* buf, int len, int flags) {
+		if (sendXOR != 0x00) {
+			for (int i = 0; i < len; i++) {
+				buf[i] ^= sendXOR;
+			}
+		}
+		int res = _send(s, buf, len, flags);
+		if (res == SOCKET_ERROR) {
+			return res;
+		}
+		if (res == 0) {
+			DEBUG(L"Connection was closed by peer");
+			return res;
 		}
 		return res;
 	}
 }
 
-namespace Socket {
+namespace Network {
 	bool InitWSAData() {
 		if (wsaData.wVersion != 0) {
 			DEBUG(L"wsaData has already been initialized");
@@ -235,21 +277,34 @@ namespace Socket {
 		DEBUG(L"WSACleanup ok");
 	}
 
+	bool FixDomain(Rosemary& r) {
+		// TMS old default DNS (Unable show ad window if not set)
+		return r.StringPatch("tw.login.maplestory.gamania.com", "127.0.0.1");
+		// Not need this because HS has been removed
+		//r.StringPatch("tw.hackshield.gamania.com", "202.80.106.36");
+	}
+
 	void SetConnectKey(const std::string& key) {
 		connectKey = key;
 	}
 
-	bool Redirect(const std::string& addr, const unsigned short port) {
-		InitSockAddr(&gSockAddr, addr, port);
+	bool Redirect(const std::string& serverAddr, const unsigned short loginServerPort) {
+		InitSockAddr(&gLoginSockAddr, serverAddr, loginServerPort);
+		InitSockAddr(&gChannelSockAddr, serverAddr, 0);
 		return SHOOK(true, &_connect, connect_Hook);
 	}
 
 	bool RecvXOR(const unsigned char XOR) {
-		if (XOR == 0x00) {
-			DEBUG(L"XOR is empty");
-			return false;
-		}
 		recvXOR = XOR;
 		return SHOOK(true, &_recv, recv_Hook);
+	}
+
+	bool SendXOR(const unsigned char XOR) {
+		sendXOR = XOR;
+		return SHOOK(true, &_send, send_Hook);
+	}
+
+	const BYTE* GetMapleVersion() {
+		return &gMapleVersion;
 	}
 }

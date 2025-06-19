@@ -1,13 +1,19 @@
 #include "Hook.h"
-#include "Config.h"
-#include "Socket.h"
-#include "ImgFile.h"
-#include "Auth.h"
-#include "CRC.h"
-#include "Screen.h"
-#include "Tool.h"
+#include "Network.h"
+#include "ResMan.h"
+#include "AntiCheat.h"
+#include "Wnd.h"
+#include "DamageSkin.h"
 
+#include "Resources/Config.h"
 #include "Share/Funcs.h"
+#include "Share/Tool.h"
+
+#include "HookEx.h"
+#pragma comment(lib, "HookEx.lib")
+
+#include <imm.h>
+#pragma comment(lib, "imm32.lib")
 
 #include<intrin.h>
 #pragma intrinsic(_ReturnAddress)
@@ -15,10 +21,9 @@
 namespace {
 	static Rosemary gMapleR;
 	static bool bGetStartupInfoALoaded = false;
-	static bool bCreateWindowExALoaded = false;
-	static bool bCreateMutexALoaded = false;
+	static bool bImmAssociateContextLoaded = false;
 
-	void GetMoudleEntryList(std::vector<MODULEENTRY32W>& entryList) {
+	void GetModuleEntryList(std::vector<MODULEENTRY32W>& entryList) {
 		DWORD pid = GetCurrentProcessId();
 
 		if (!pid) {
@@ -55,7 +60,7 @@ namespace {
 			return true;
 		}
 		std::vector<MODULEENTRY32W> entryList;
-		GetMoudleEntryList(entryList);
+		GetModuleEntryList(entryList);
 		if (entryList.empty()) {
 			DEBUG(L"EXE hasn't been call yet");
 			return false;
@@ -80,92 +85,64 @@ namespace {
 		return false;
 	}
 
-	// 1.FixDomain: Unable show ad window if not set
-	// 2.RemoveLocaleCheck(option): For other locale
-	// 3.Redirect: Modify connect ip and port
-	// 4.SendConnectKey(option): Avoid using cmd start client
-	// 5.RecvXOR(option): XOR all packet from server
-	// 6.RemoveAntiCheat: NGS/HS/X3
-	// 7.MountImgFile: Convert wz file to img format
-	// 8.FixWindowMode(option): Avoid old client can't run with recent displays
-	// 9.RemoveCRC: Avoid client crash after 30s or enter field
 	static auto _GetStartupInfoA = decltype(&GetStartupInfoA)(GetProcAddress(GetModuleHandleW(L"KERNEL32"), "GetStartupInfoA"));
 	VOID WINAPI GetStartupInfoA_Hook(LPSTARTUPINFOA lpStartupInfo) {
 		if (lpStartupInfo && !bGetStartupInfoALoaded && IsEXECaller(_ReturnAddress())) {
 			bGetStartupInfoALoaded = true;
 			// Click MapleStory.exe
-			if (!Screen::FixDomain(gMapleR)) {
+			if (!Network::InitWSAData()) {
+				DEBUG(L"Unable to init WSAData");
+			}
+			if (!Network::FixDomain(gMapleR)) {
 				DEBUG(L"Unable to fix domain");
 			}
-			if (!Auth::RemoveLocaleCheck(gMapleR)) {
+			if (!AntiCheat::RemoveLocaleCheck(gMapleR)) {
 				DEBUG(L"Unable to remove locale check");
 			}
 			// Click Play button
-			if (!Socket::InitWSAData()) {
-				DEBUG(L"Unable to init WSAData");
-			}
 			if (Config::IsSendConnectKey) {
-				Socket::SetConnectKey(Config::ConnectKey);
+				Network::SetConnectKey(Config::ConnectKey);
 			}
-			if (!Socket::Redirect(Config::LoginServerAddr, Config::LoginServerPort)) {
+			if (!Network::Redirect(Config::ServerAddr, Config::LoginServerPort)) {
 				DEBUG(L"Unable to redirect the connection");
 			}
-			if (Config::IsRecvXOR) {
-				if (!Socket::RecvXOR(Config::RecvXOR)) {
-					DEBUG(L"Unable to hook recv");
-				}
+			if (!Network::RecvXOR(Config::RecvXOR)) {
+				DEBUG(L"Unable to hook recv");
+			}
+			if (!Network::SendXOR(Config::SendXOR)) {
+				DEBUG(L"Unable to hook send");
 			}
 			// Load AntiCheat 
-			if (!Auth::RemoveAntiCheat(gMapleR)) {
-				DEBUG(L"Unable to remove AntiCheat");
+			if (!AntiCheat::RemoveSecurityClient(gMapleR)) {
+				DEBUG(L"Unable to remove SecurityClient");
 			}
-			// Load wz file
-			if (Config::IsImgFile) {
-				if (!ImgFile::Mount(gMapleR)) {
-					DEBUG(L"Unable to mount img file");
-				}
+			// Check if base.wz exists? wz default mode or img mode
+			// Check if multiple.wz exists? wz multiple mode or wz default mode
+			if (!HookEx::Mount(gMapleR, Network::GetMapleVersion(), &Config::MapleWZKey)) {
+				DEBUG(L"Unable to mount ResMan");
+			}
+			if (!ResMan::Extend(gMapleR)) {
+				DEBUG(L"Unable to extend ResMan");
 			}
 			// Game window is loaded
-			if (!Screen::FixWindowMode(gMapleR)) {
+			if (!Wnd::FixWindowMode(gMapleR)) {
 				DEBUG(L"Unable to fix window mode");
 			}
 			// Login UI is loaded
-			if (!CRC::RemoveRenderFrameCheck(gMapleR)) {
+			if (!AntiCheat::RemoveRenderFrameCheck(gMapleR)) {
 				DEBUG(L"Unable to remove Render Frame Check");
 			}
 			// Select character
-			if (!CRC::RemoveCWvsContextOnEnterFieldCheck(gMapleR)) {
+			if (!AntiCheat::RemoveEnterFieldCheck(gMapleR)) {
 				DEBUG(L"Unable to remove Enter Field Check");
 			}
 		}
 		_GetStartupInfoA(lpStartupInfo);
 	}
 
-	static auto _CreateWindowExA = decltype(&CreateWindowEx)(GetProcAddress(GetModuleHandleW(L"USER32"), "CreateWindowExA"));
-	HWND WINAPI CreateWindowExA_Hook(DWORD dwExStyle, LPCTSTR lpClassName, LPCTSTR lpWindowName, DWORD dwStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam) {
-		// AoB 68 00 00 04 80
-		if (lpClassName && strstr(lpClassName, "StartUpDlgClass")) {
-			// Found in ShowADBalloon 
-			return NULL;
-		}
-		if (lpClassName && strstr(lpClassName, "MapleStoryClass")) {
-			// Found in ShowStartUpWnd
-			lpWindowName = Config::WindowTitle.c_str(); //Customize game windowtitle 	
-			Screen::FixMinimizeButton(dwStyle); // Show minimize button for TMS113 - TMS118
-		}
-
-		return _CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-	}
-
 	// CreateMutexA is the first Windows library call after the executable unpacks itself. 
-	// It is recommended to have all Maple hooking and memory editing inside or called from the CreateMutexA function.
 	static auto _CreateMutexA = decltype(&CreateMutexA)(GetProcAddress(GetModuleHandleW(L"KERNEL32"), "CreateMutexA"));
 	HANDLE WINAPI CreateMutexA_Hook(LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner, LPCSTR lpName) {
-		if (!bCreateMutexALoaded) {
-			bCreateMutexALoaded = true;
-			// TODO
-
-		}
 		if (Config::IsMultipleClient) {
 			// Put this condition at the bottom
 			if (lpName && strstr(lpName, "WvsClientMtx")) {
@@ -176,13 +153,49 @@ namespace {
 		return _CreateMutexA(lpMutexAttributes, bInitialOwner, lpName);
 	}
 
+	static auto _CreateWindowExA = decltype(&CreateWindowEx)(GetProcAddress(GetModuleHandleW(L"USER32"), "CreateWindowExA"));
+	HWND WINAPI CreateWindowExA_Hook(DWORD dwExStyle, LPCTSTR lpClassName, LPCTSTR lpWindowName, DWORD dwStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam) {
+		// AOB 68 00 00 04 80
+		if (lpClassName && strstr(lpClassName, "StartUpDlgClass")) {
+			// Found in ShowADBalloon 
+			return NULL;
+		}
+		if (lpClassName && strstr(lpClassName, "MapleStoryClass")) {
+			// Found in ShowStartUpWnd
+			lpWindowName = Config::WindowTitle.c_str(); //Customize game window title 	
+			Wnd::FixMinimizeButton(dwStyle); // Show minimize button for TMS113 - TMS118
+		}
+		return _CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+	}
+
+	static auto _ImmAssociateContext = decltype(&ImmAssociateContext)(GetProcAddress(GetModuleHandleW(L"IMM32"), "ImmAssociateContext"));
+	HIMC WINAPI ImmAssociateContext_Hook(HWND hWnd, HIMC hIMC) {
+		// Call by CWndMan::CWndMan<-CWvsApp::CreateWndManager after CWvsApp::InitializeGameData in CWvsApp::SetUp 
+		if (!bImmAssociateContextLoaded) {
+			// TODO
+			bImmAssociateContextLoaded = true;
+			if (Config::DamageSkinID > 0) {
+				if (!DamageSkin::Init()) {
+					DEBUG(L"Unable to init Damage Skin");
+				}
+				else {
+					DamageSkin::ApplyLocally(Config::DamageSkinID);
+				}
+			}
+		}
+		// Enable IME input
+		HIMC overrideHIMC = ImmGetContext(hWnd);
+		ImmSetOpenStatus(overrideHIMC, TRUE);
+		return _ImmAssociateContext(hWnd, overrideHIMC);
+	}
 }
 
 namespace Hook {
 	void Install() {
 		bool ok = SHOOK(true, &_GetStartupInfoA, GetStartupInfoA_Hook) &&
+			SHOOK(true, &_CreateMutexA, CreateMutexA_Hook) &&
 			SHOOK(true, &_CreateWindowExA, CreateWindowExA_Hook) &&
-			SHOOK(true, &_CreateMutexA, CreateMutexA_Hook);
+			SHOOK(true, &_ImmAssociateContext, ImmAssociateContext_Hook);
 		if (!ok) {
 			DEBUG(L"Failed to install hook");
 		}
@@ -190,11 +203,12 @@ namespace Hook {
 
 	void Uninstall() {
 		bool ok = SHOOK(false, &_GetStartupInfoA, GetStartupInfoA_Hook) &&
+			SHOOK(false, &_CreateMutexA, CreateMutexA_Hook) &&
 			SHOOK(false, &_CreateWindowExA, CreateWindowExA_Hook) &&
-			SHOOK(false, &_CreateMutexA, CreateMutexA_Hook);
+			SHOOK(false, &_ImmAssociateContext, ImmAssociateContext_Hook);
 		if (!ok) {
 			DEBUG(L"Failed to uninstall hook");
 		}
-		Socket::ClearupWSA();
+		Network::ClearupWSA();
 	}
 }

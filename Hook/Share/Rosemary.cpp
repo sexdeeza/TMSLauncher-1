@@ -1,5 +1,5 @@
 #include "Rosemary.h"
-#include "AobScan.h"
+#include "AOBScan.h"
 
 Rosemary::Rosemary() {
 	init = false;
@@ -56,12 +56,12 @@ bool Rosemary::GetSectionList(std::vector<MEMORY_BASIC_INFORMATION>& vSection) {
 	return true;
 }
 
-ULONG_PTR Rosemary::Scan(std::wstring wAob, int res) {
+ULONG_PTR Rosemary::Scan(std::wstring wAOB, int res) {
 	if (!init) {
 		return 0;
 	}
 
-	AobScan a(wAob);
+	AOBScan a(wAOB);
 
 	int count = 0;
 	for (size_t i = 0; i < section_list.size(); i++) {
@@ -82,7 +82,7 @@ ULONG_PTR Rosemary::Scan(std::wstring wAob, int res) {
 }
 
 // ListScan
-ULONG_PTR Rosemary::Scan(std::wstring wAobList[], size_t size, size_t& index, bool(*Scanner)(ULONG_PTR)) {
+ULONG_PTR Rosemary::Scan(std::wstring wAOBList[], size_t size, size_t& index, bool(*Scanner)(ULONG_PTR)) {
 	ULONG_PTR uAddress = 0;
 
 	index = -1;
@@ -94,10 +94,10 @@ ULONG_PTR Rosemary::Scan(std::wstring wAobList[], size_t size, size_t& index, bo
 	for (size_t i = 0; i < size; i++) {
 
 		if (!Scanner) {
-			uAddress = Scan(wAobList[i]);
+			uAddress = Scan(wAOBList[i]);
 		}
 		else {
-			uAddress = Scan(wAobList[i], Scanner);
+			uAddress = Scan(wAOBList[i], Scanner);
 		}
 
 		if (uAddress) {
@@ -109,7 +109,8 @@ ULONG_PTR Rosemary::Scan(std::wstring wAobList[], size_t size, size_t& index, bo
 	return 0;
 }
 
-ULONG_PTR Rosemary::Scan(std::wstring wAob, bool(*Scanner)(ULONG_PTR)) {
+
+ULONG_PTR Rosemary::Scan(std::wstring wAOB, bool(*Scanner)(ULONG_PTR)) {
 	if (!init) {
 		return 0;
 	}
@@ -118,7 +119,7 @@ ULONG_PTR Rosemary::Scan(std::wstring wAob, bool(*Scanner)(ULONG_PTR)) {
 		return 0;
 	}
 
-	AobScan a(wAob);
+	AOBScan a(wAOB);
 
 	for (size_t i = 0; i < section_list.size(); i++) {
 		for (ULONG_PTR uAddress = (ULONG_PTR)section_list[i].BaseAddress; uAddress < ((ULONG_PTR)section_list[i].BaseAddress + section_list[i].RegionSize); uAddress++) {
@@ -227,13 +228,14 @@ bool Rosemary::FillBytes(ULONG_PTR uAddress, const unsigned char ucValue, const 
 		return false;
 	}
 	DWORD oldProtect = 0;
+	size_t nSize = sizeof(ucValue);
 	if (!VirtualProtect((void*)uAddress, nCount, PAGE_EXECUTE_READWRITE, &oldProtect)) {
 		return false;
 	}
 
 	memset((void*)uAddress, ucValue, nCount);
 
-	VirtualProtect((void*)uAddress, nCount, oldProtect, &oldProtect);
+	VirtualProtect((void*)uAddress, nSize, oldProtect, &oldProtect);
 
 	return true;
 }

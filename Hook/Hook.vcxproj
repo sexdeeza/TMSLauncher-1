@@ -74,24 +74,28 @@
     <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -103,14 +107,21 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>NotSet</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Manifest>
+      <AdditionalOptions>-mllvm -fla -mllvm -sub -mllvm -sub_loop=3 -mllvm -sobf -mllvm -icall -mllvm -ibr -mllvm -igv -mllvm -split -mllvm -split_num=5 %(AdditionalOptions)</AdditionalOptions>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -124,16 +135,21 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>NotSet</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Manifest>
+      <AdditionalOptions>-mllvm -fla -mllvm -sub -mllvm -sub_loop=3 -mllvm -sobf -mllvm -icall -mllvm -ibr -mllvm -igv -mllvm -split -mllvm -split_num=5 %(AdditionalOptions)</AdditionalOptions>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -145,14 +161,21 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>NotSet</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Manifest>
+      <AdditionalOptions>-mllvm -fla -mllvm -sub -mllvm -sub_loop=3 -mllvm -sobf -mllvm -icall -mllvm -ibr -mllvm -igv -mllvm -split -mllvm -split_num=5 %(AdditionalOptions)</AdditionalOptions>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -166,45 +189,56 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>NotSet</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Manifest>
+      <AdditionalOptions>-mllvm -fla -mllvm -sub -mllvm -sub_loop=3 -mllvm -sobf -mllvm -icall -mllvm -ibr -mllvm -igv -mllvm -split -mllvm -split_num=5 %(AdditionalOptions)</AdditionalOptions>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AobList.h" />
-    <ClInclude Include="Auth.h" />
-    <ClInclude Include="Config.h" />
-    <ClInclude Include="ImgFile.h" />
-    <ClInclude Include="Maple\CWvsApp.h" />
-    <ClInclude Include="Screen.h" />
-    <ClInclude Include="CRC.h" />
+    <ClInclude Include="AntiCheat.h" />
+    <ClInclude Include="com\archive.h" />
+    <ClInclude Include="com\canvas.h" />
+    <ClInclude Include="com\com.h" />
+    <ClInclude Include="com\gr2d.h" />
+    <ClInclude Include="com\property.h" />
+    <ClInclude Include="com\serialize.h" />
+    <ClInclude Include="com\shape2d.h" />
+    <ClInclude Include="com\uol.h" />
+    <ClInclude Include="DamageSkin.h" />
+    <ClInclude Include="ResMan.h" />
+    <ClInclude Include="Resources\AOBList.h" />
+    <ClInclude Include="Resources\Config.h" />
+    <ClInclude Include="Wnd.h" />
     <ClInclude Include="Hook.h" />
-    <ClInclude Include="Share\AobScan.h" />
+    <ClInclude Include="Share\AOBScan.h" />
     <ClInclude Include="Share\Funcs.h" />
     <ClInclude Include="Share\Rosemary.h" />
-    <ClInclude Include="Socket.h" />
-    <ClInclude Include="Tool.h" />
+    <ClInclude Include="Network.h" />
+    <ClInclude Include="Share\Tool.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Auth.cpp" />
+    <ClCompile Include="AntiCheat.cpp" />
+    <ClCompile Include="DamageSkin.cpp" />
     <ClCompile Include="Hook.cpp" />
-    <ClCompile Include="ImgFile.cpp" />
-    <ClCompile Include="Maple\CWvsApp.cpp" />
-    <ClCompile Include="Screen.cpp" />
-    <ClCompile Include="CRC.cpp" />
+    <ClCompile Include="ResMan.cpp" />
+    <ClCompile Include="Wnd.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Share\AobScan.cpp" />
+    <ClCompile Include="Share\AOBScan.cpp" />
     <ClCompile Include="Share\Funcs.cpp" />
     <ClCompile Include="Share\Rosemary.cpp" />
-    <ClCompile Include="Socket.cpp" />
-    <ClCompile Include="Tool.cpp" />
+    <ClCompile Include="Network.cpp" />
+    <ClCompile Include="Share\Tool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
