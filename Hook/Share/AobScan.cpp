@@ -1,63 +1,63 @@
-#include "AobScan.h"
+#include "AOBScan.h"
 
-AobScan::AobScan(std::wstring wAob) {
-	init = CreateAob(wAob);
+AOBScan::AOBScan(std::wstring wAOB) {
+	init = CreateAOB(wAOB);
 }
 
-bool AobScan::CreateAob(std::wstring wAob) {
-	if (wAob.length() < 2) {
+bool AOBScan::CreateAOB(std::wstring wAOB) {
+	if (wAOB.length() < 2) {
 		return false;
 	}
 
-	std::wstring Aob;
+	std::wstring AOB;
 
-	for (size_t i = 0; i < wAob.length(); i++) {
-		if (wAob[i] == L' ') {
+	for (size_t i = 0; i < wAOB.length(); i++) {
+		if (wAOB[i] == L' ') {
 			continue;
 		}
-		if (L'0' <= wAob[i] && wAob[i] <= L'9') {
-			Aob.push_back(wAob[i]);
+		if (L'0' <= wAOB[i] && wAOB[i] <= L'9') {
+			AOB.push_back(wAOB[i]);
 			continue;
 		}
-		if (L'A' <= wAob[i] && wAob[i] <= L'F') {
-			Aob.push_back(wAob[i]);
+		if (L'A' <= wAOB[i] && wAOB[i] <= L'F') {
+			AOB.push_back(wAOB[i]);
 			continue;
 		}
-		if (L'a' <= wAob[i] && wAob[i] <= L'f') {
-			Aob.push_back((unsigned short)wAob[i] - 0x20);
+		if (L'a' <= wAOB[i] && wAOB[i] <= L'f') {
+			AOB.push_back((unsigned short)wAOB[i] - 0x20);
 			continue;
 		}
-		if (wAob[i] == L'?' || wAob[i] == L'*') {
-			Aob.push_back(L'?');
+		if (wAOB[i] == L'?' || wAOB[i] == L'*') {
+			AOB.push_back(L'?');
 			continue;
 		}
 		return false;
 	}
 
-	if (Aob.length() % 2) {
+	if (AOB.length() % 2) {
 		return false;
 	}
 
-	for (size_t i = 0; i < Aob.length(); i += 2) {
+	for (size_t i = 0; i < AOB.length(); i += 2) {
 		unsigned char t = 0x00;
 		int m = 0;
-		if (Aob[i] == L'?') {
+		if (AOB[i] == L'?') {
 			m |= 1;
 		}
-		if (L'0' <= Aob[i] && Aob[i] <= L'9') {
-			t |= ((unsigned char)Aob[i] - 0x30) << 4;
+		if (L'0' <= AOB[i] && AOB[i] <= L'9') {
+			t |= ((unsigned char)AOB[i] - 0x30) << 4;
 		}
-		else if (L'A' <= Aob[i] && Aob[i] <= L'F') {
-			t |= ((unsigned char)Aob[i] - 0x37) << 4;
+		else if (L'A' <= AOB[i] && AOB[i] <= L'F') {
+			t |= ((unsigned char)AOB[i] - 0x37) << 4;
 		}
-		if (Aob[i + 1] == L'?') {
+		if (AOB[i + 1] == L'?') {
 			m |= 2;
 		}
-		if (L'0' <= Aob[i + 1] && Aob[i + 1] <= L'9') {
-			t |= ((unsigned char)Aob[i + 1] - 0x30);
+		if (L'0' <= AOB[i + 1] && AOB[i + 1] <= L'9') {
+			t |= ((unsigned char)AOB[i + 1] - 0x30);
 		}
-		else if (L'A' <= Aob[i + 1] && Aob[i + 1] <= L'F') {
-			t |= ((unsigned char)Aob[i + 1] - 0x37);
+		else if (L'A' <= AOB[i + 1] && AOB[i + 1] <= L'F') {
+			t |= ((unsigned char)AOB[i + 1] - 0x37);
 		}
 
 		array_of_bytes.push_back(t);
@@ -68,7 +68,7 @@ bool AobScan::CreateAob(std::wstring wAob) {
 }
 
 
-bool AobScan::Compare(unsigned __int64 uAddress) {
+bool AOBScan::Compare(unsigned __int64 uAddress) {
 	if (!init) {
 		return false;
 	}
@@ -102,6 +102,6 @@ bool AobScan::Compare(unsigned __int64 uAddress) {
 	return true;
 }
 
-size_t AobScan::size() {
+size_t AOBScan::size() {
 	return array_of_bytes.size();
 }

@@ -1,7 +1,8 @@
 #pragma once
 #include <windows.h>
 #include <string>
-#include "Config.h"
+
+#include "../Resources/Config.h"
 
 std::wstring BYTE2String(BYTE b);
 std::wstring DWORD2String(DWORD dw);
@@ -19,3 +20,12 @@ ULONG_PTR GetDWORDAddress(ULONG_PTR uPush);
 }\
 
 #define SCANRES(msg) { DEBUG(L""#msg" = " + DWORD2String(msg));}
+
+#define CHECK_HRESULT(HR) \
+do { \
+    HRESULT _hr = (HR); \
+    if (FAILED(_hr)) { \
+		SCANRES(_hr); \
+        _com_issue_error(_hr); \
+    } \
+} while (0)
