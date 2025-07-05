@@ -136,6 +136,10 @@ namespace {
 			if (!AntiCheat::RemoveEnterFieldCheck(gMapleR)) {
 				DEBUG(L"Unable to remove Enter Field Check");
 			}
+			// Exit game
+			if (!AntiCheat::RemoveTerminationError(gMapleR)) {
+				DEBUG(L"Unable to remove termination error");
+			}
 		}
 		_GetStartupInfoA(lpStartupInfo);
 	}

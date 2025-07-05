@@ -170,6 +170,24 @@ namespace AntiCheat {
 		return true;
 	}
 
+	bool RemoveTerminationError(Rosemary& r)
+	{
+		ULONG_PTR uAddress = 0;
+		size_t length = AOB_Scan_CSecurityClient__ClearModule_Addrs.size();
+		for (size_t index = 0; index < length; index++)
+		{
+			uAddress = r.Scan(AOB_Scan_CSecurityClient__ClearModule_Addrs[index]);
+			if (uAddress > 0) {
+				break;
+			}
+		}
+		if (uAddress == 0) {
+			DEBUG(L"Unable find CSecurityClient::ClearModule");
+			return false;
+		}
+		return r.WriteCode(uAddress, AOB_Code_Ret);
+	}
+
 	bool RemoveRenderFrameCheck(Rosemary& r) {
 		uRenderFrameAddress = r.Scan(AOB_Scan_IWzGr2D__RenderFrame); // IWzGr2D::RenderFrame
 		if (uRenderFrameAddress == 0) {
