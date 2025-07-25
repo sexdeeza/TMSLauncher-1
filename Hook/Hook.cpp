@@ -168,6 +168,12 @@ namespace {
 			// Found in ShowStartUpWnd
 			lpWindowName = Config::WindowTitle.c_str(); //Customize game window title 	
 			Wnd::FixMinimizeButton(dwStyle); // Show minimize button for TMS113 - TMS118
+			// Place the game window in the center of the screen
+			RECT screenRect;
+			GetWindowRect(GetDesktopWindow(), &screenRect);
+			int centerX = screenRect.right / 2 - nWidth / 2;
+			int centerY = screenRect.bottom / 2 - nHeight / 2;
+			return _CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, centerX, centerY, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 		}
 		return _CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 	}

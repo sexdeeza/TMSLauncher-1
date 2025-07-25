@@ -33,6 +33,7 @@
 *.app
 
 # Temp file
+*.aps
 .vs
 Debug
 Release
