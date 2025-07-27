@@ -56,7 +56,7 @@ Please tell me if you find any errors during login to these versions
 3. Put `Launcher.exe` and `Hook.dll` into MapleStory directory
 4. Run `Launcher.exe` to connect login server
 
-## Thanks
+## Credits
 - [EmuMain](https://github.com/rage123450/EmuClient/blob/develop/EmuMain/EmuMain.cpp) shared by rage123450
 - [Tools](https://github.com/Riremito/tools) shared by Riremito
 - [kinoko_client](https://github.com/iw2d/kinoko_client) shared by iw2d
