@@ -1,10 +1,9 @@
+#include "pch.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include "Network.h"
 
 #include "Resources/AOBList.h"
-#include "Share/Funcs.h"
-#include "Share/Tool.h"
 
 #pragma comment(lib, "ws2_32.lib")
 

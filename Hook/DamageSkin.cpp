@@ -1,8 +1,6 @@
-#include <vector>
+#include "pch.h"
 #include "DamageSkin.h"
 #include "ResMan.h"
-
-#include "Share/Tool.h"
 
 namespace {
 	static IWzPropertyPtr gBasicEffImg;

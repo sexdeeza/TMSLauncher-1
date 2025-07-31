@@ -1,5 +1,4 @@
 #pragma once
-#include "Share/Rosemary.h"
 
 namespace Wnd {
 	bool FixWindowMode(Rosemary& r); // Allow older clients(BeforeBB) to run at the recent displays

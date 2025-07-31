@@ -1,8 +1,6 @@
 #pragma once
 #include <set> 
-
 #include "com/com.h"
-#include "Share/Rosemary.h"
 
 namespace ResMan {
 	bool Extend(Rosemary& r);

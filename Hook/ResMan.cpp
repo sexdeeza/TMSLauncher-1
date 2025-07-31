@@ -1,12 +1,7 @@
+#include "pch.h"
 #include "ResMan.h"
-#include "HookEx.h"
 
 #include "Resources/AOBList.h"
-#include "Share/Funcs.h"
-#include "Share/Tool.h"
-
-#include<intrin.h>
-#pragma intrinsic(_ReturnAddress)
 
 namespace {
 
