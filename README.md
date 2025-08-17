@@ -43,21 +43,23 @@ Please tell me if you find any errors during login to these versions
 3. Set the `DamageSkinID` in `Config.h`
 ## How to use
 ### Debug
-1. Set `IS_DEV` is true
+1. Set `IS_DEV` is true in `Launcher.cpp`
 2. Set `REMOTE_DIR` to MapleStory directory
 3. Set options in `Config.h`
-4. Build solution with `Release x86` mode
-5. Run it in Visual Studio will inject hook by remote
-6. Recommend using [DebugView](https://learn.microsoft.com/en-us/sysinternals/downloads/debugview) to see debug log
+4. Set `IS_DEBUG_MODE` true in `pch.h`
+5. Build solution with `Release x86` mode
+6. Run it in Visual Studio will inject hook by remote
+7. Recommend using [DebugView](https://learn.microsoft.com/en-us/sysinternals/downloads/debugview) to see debug log
 
 ### Release
-1. Set `IS_DEV` is false
-2. Build solution with `Release x86` mode
-3. Put `Launcher.exe` and `Hook.dll` into MapleStory directory
-4. Run `Launcher.exe` to connect login server
+1. Set `IS_DEV` is false in `Launcher.cpp`
+2. Set `IS_DEBUG_MODE` false in `pch.h`
+3. Build solution with `Release x86` mode
+4. Put `Launcher.exe` and `Hook.dll` into MapleStory directory
+5. Run `Launcher.exe` to connect login server
 
 ## Credits
-- [EmuMain](https://github.com/rage123450/EmuClient/blob/develop/EmuMain/EmuMain.cpp) shared by rage123450
+- [EmuClient](https://github.com/Riremito/EmuClient) shared by Riremito
 - [Tools](https://github.com/Riremito/tools) shared by Riremito
 - [kinoko_client](https://github.com/iw2d/kinoko_client) shared by iw2d
 - [HaRepacker](https://github.com/lastbattle/Harepacker-resurrected) shared by lastbattle

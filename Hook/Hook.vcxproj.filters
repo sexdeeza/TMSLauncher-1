@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Share">
-      <UniqueIdentifier>{a190da35-8495-4102-931c-1386a0ab2a7e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Share">
-      <UniqueIdentifier>{fd8f90a4-d30e-4f15-bdc9-ff4946b826ba}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\com">
       <UniqueIdentifier>{7dc8f18b-3caa-440d-9609-092a008eb7c5}</UniqueIdentifier>
     </Filter>
@@ -26,12 +20,6 @@
   <ItemGroup>
     <ClInclude Include="Hook.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Share\Rosemary.h">
-      <Filter>Header Files\Share</Filter>
-    </ClInclude>
-    <ClInclude Include="Share\AOBScan.h">
-      <Filter>Header Files\Share</Filter>
     </ClInclude>
     <ClInclude Include="AntiCheat.h">
       <Filter>Header Files</Filter>
@@ -42,9 +30,6 @@
     <ClInclude Include="Network.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Share\Funcs.h">
-      <Filter>Header Files\Share</Filter>
-    </ClInclude>
     <ClInclude Include="ResMan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -53,9 +38,6 @@
     </ClInclude>
     <ClInclude Include="Resources\Config.h">
       <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Share\Tool.h">
-      <Filter>Header Files\Share</Filter>
     </ClInclude>
     <ClInclude Include="com\canvas.h">
       <Filter>Header Files\com</Filter>
@@ -84,16 +66,13 @@
     <ClInclude Include="com\archive.h">
       <Filter>Header Files\com</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Share\AOBScan.cpp">
-      <Filter>Source Files\Share</Filter>
-    </ClCompile>
-    <ClCompile Include="Share\Rosemary.cpp">
-      <Filter>Source Files\Share</Filter>
     </ClCompile>
     <ClCompile Include="AntiCheat.cpp">
       <Filter>Source Files</Filter>
@@ -107,16 +86,13 @@
     <ClCompile Include="Network.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Share\Funcs.cpp">
-      <Filter>Source Files\Share</Filter>
-    </ClCompile>
     <ClCompile Include="ResMan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Share\Tool.cpp">
-      <Filter>Source Files\Share</Filter>
-    </ClCompile>
     <ClCompile Include="DamageSkin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

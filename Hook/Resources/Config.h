@@ -2,8 +2,6 @@
 #include <string>
 
 namespace Config {
-	// Tool
-	const bool IsDebugMode = true;
 	// Socket
 	const std::string ServerAddr = "127.0.0.1";
 	const unsigned short LoginServerPort = 8484;

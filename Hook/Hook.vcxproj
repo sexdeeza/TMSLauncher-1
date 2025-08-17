@@ -216,29 +216,23 @@
     <ClInclude Include="com\shape2d.h" />
     <ClInclude Include="com\uol.h" />
     <ClInclude Include="DamageSkin.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="ResMan.h" />
     <ClInclude Include="Resources\AOBList.h" />
     <ClInclude Include="Resources\Config.h" />
     <ClInclude Include="Wnd.h" />
     <ClInclude Include="Hook.h" />
-    <ClInclude Include="Share\AOBScan.h" />
-    <ClInclude Include="Share\Funcs.h" />
-    <ClInclude Include="Share\Rosemary.h" />
     <ClInclude Include="Network.h" />
-    <ClInclude Include="Share\Tool.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AntiCheat.cpp" />
     <ClCompile Include="DamageSkin.cpp" />
     <ClCompile Include="Hook.cpp" />
+    <ClCompile Include="pch.cpp" />
     <ClCompile Include="ResMan.cpp" />
     <ClCompile Include="Wnd.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Share\AOBScan.cpp" />
-    <ClCompile Include="Share\Funcs.cpp" />
-    <ClCompile Include="Share\Rosemary.cpp" />
     <ClCompile Include="Network.cpp" />
-    <ClCompile Include="Share\Tool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
